@@ -6,14 +6,16 @@ sub multiply {
 	$_ = shift;
 	chomp;
 	my %degree;
+	$result=1+0;
+	$result *= ($1+0) while (s/(?=[^\^]*)([0-9]+)//);
 	$degree{"$1"} += $2 while (s/([a-zA-Z])\^\(?([0-9]+)\)?//);
 	++$degree{"$1"} while (s/([a-zA-Z])(?=[^\^]?)//);
 	@operands = sort keys %degree;
-	my $result;
+	$result.="*";
 	foreach $key (@operands) {
 		$result.="($key\^$degree{$key})";
 	}
-	return $result;
+	return "$result";
 }
 
 #"bool" func, check brackets
@@ -31,70 +33,36 @@ sub checkBrackets {
 	@stack?return 0:return 1; 
 }
 
-#
+#multiplying brackets (only with pluses =()
 sub multiplyBrackets {
 	($first,$second) = @_;
 	@firstOperands = split /\+/,$first;
 	@secondOperands = split /\+/,$second;
+	my $result;
 	foreach $first (@firstOperands) {
+		print "first - $first";
 		foreach $second (@secondOperands) {
+			print "second - $second";
 			$result.=multiply($first.$second).+"+";
 		}
 	}
 	print $result;
 }
-$input = <>;
-chomp $input;
-print multiply($input);
 
-__END__
-sub makeSimpleAndSorted {
-	$input = shift @_;
-	@operands = $input =~ /([a-zA-Z]\^\(?[0-9]+\)?)?/g;
-	$input =~ s/[a-zA-Z]\^\([0-9]+\)?//g;
-	my %output;
-	map {	
-		/([a-zA-Z]).\(?([0-9]+)/;
-		$output{$1} += $2 if $2;
-	}@operands;
-	@operands = split//,$input;
-	map {
-		++$output{$_} if /[a-zA-Z]/;
-	}@operands;
-	@operands = sort keys %output;
-	map {
-		$output.="$_".'^'."($output{$_})" if /[a-zA-Z]/;
-	}@operands;
-	return $output;
-}
-
-
-sub checkBrackets {
-	my @stack;
-	@input = split //,shift;
-	map {
-		if (/\(/) {
-			push @stack,'(';
-		} elsif(/\)/) {
-			return 0 unless @stack;
-			pop @stack;
+#privodit podobnie (xz kak eto na angl, len' iskat')
+#TODO:/ Нужно допилить эту функцию, то что написано бред
+#я его писал в два часа ночи
+sub sum {
+	$_ = shift;
+	@operands = split /\+/;
+	my %result;
+	foreach  $operand (@operand) {
+		if ($result{$_}) {
+			$result{$_} = multiply($result{$_}.$operand);
+		} else {
+			$result{$_} = $operand;
 		}
-	}@input;
-	@stack?return 0:return 1; 
+	}
+	@operand = sort keys %result;
 }
-
-
-sub subsetInsideBracket{
-	$input = shift;
-	@sums = split /[+-]/,$input;
-	print "@sums"." : sums";
-	map {
-		$input =~ s/($_)/makeSimpleAndSorted($1)/e;
-	}@sums;
-	return $input;
-}
-$first = <>;
-chomp $first;
-#print checkBrackets($first);
-#print makeSimpleAndSorted($first);
-print subsetInsideBracket($first);
+multiplyBrackets('a+a+b','b+c');
