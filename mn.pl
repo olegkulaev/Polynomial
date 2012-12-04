@@ -1,6 +1,5 @@
 ﻿#!/usr/bin/perl -l
 
-
 #making expression sorted and simple
 sub multiply {
 	$_ = shift;
@@ -49,20 +48,28 @@ sub multiplyBrackets {
 	print $result;
 }
 
-#privodit podobnie (xz kak eto na angl, len' iskat')
-#TODO:/ Нужно допилить эту функцию, то что написано бред
-#я его писал в два часа ночи
+#приводит подобные внутри одной скобки
+#3a^7b^9+2a^7b^9 = 5*a^7b^9
 sub sum {
-	$_ = shift;
-	@operands = split /\+/;
+	$input = shift;
+	chomp $input;
+	@operands = split /\+/,$input;
 	my %result;
-	foreach  $operand (@operand) {
-		if ($result{$_}) {
-			$result{$_} = multiply($result{$_}.$operand);
+	foreach $operand (@operands) {
+		$coef = $1 if $operand =~ s/^(\-?[0-9]+)//;
+		if (!$result{$operand}) {
+			$result{$operand} = $coef if $coef;
 		} else {
-			$result{$_} = $operand;
+			$result{$operand} += $coef if $coef;
 		}
 	}
-	@operand = sort keys %result;
+	my $result;
+	@operands = sort keys %result;
+	foreach $operand (@operands) {
+		$result.="$result{$operand}*$operand+";
+	}
+	chop $result;
+	return $result;
 }
-multiplyBrackets('a+a+b','b+c');
+
+print sum('112a^7b^9+-221a^7b^9+456b');
