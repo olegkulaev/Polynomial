@@ -4,17 +4,23 @@
 sub multiply {
 	$_ = shift;
 	chomp;
-	my %degree;
-	$result=1+0;
-	$result *= ($1+0) while (s/(?=[^\^]*)([0-9]+)//);
-	$degree{"$1"} += $2 while (s/([a-zA-Z])\^\(?([0-9]+)\)?//);
-	++$degree{"$1"} while (s/([a-zA-Z])(?=[^\^]?)//);
-	@operands = sort keys %degree;
-	$result.="*";
-	foreach $key (@operands) {
-		$result.="($key\^$degree{$key})";
-	}
-	return "$result";
+	@_ = split /\+/;
+	my $return='';
+	map {
+		my %degree;
+		$result=1+0;
+		$result *= ($1+0) while (s/(?=[^\^]*)(\-?[0-9]+)//);
+		$degree{"$1"} += $2 while (s/([a-zA-Z])\^\(?([0-9]+)\)?//);
+		++$degree{"$1"} while (s/([a-zA-Z])(?=[^\^]?)//);
+		@operands = sort keys %degree;
+		$result.="*";
+		foreach $key (@operands) {
+			$result.="($key\^$degree{$key})";
+		}
+		$return.="${result}+";
+	}@_;
+	chop $return;
+	return "$return";
 }
 
 #"bool" func, check brackets
@@ -45,7 +51,7 @@ sub multiplyBrackets {
 			$result.=multiply($first.$second).+"+";
 		}
 	}
-	print $result;
+	return $result;
 }
 
 #приводит подобные внутри одной скобки
@@ -72,4 +78,23 @@ sub sum {
 	return $result;
 }
 
+#Заменяет все плюсы в строке на +-, нужно для корректной работы sum
+sub prePlus {
+	$_ = shift;
+	s/\-/\+\-/;
+	return $_;
+}
+
+sub standartPol {
+	$input = shift;
+	if ()
+}
+#test
+# $first = 'b^5a^5+c^7*(a+b)'
+# $second = 'a^5b^5+(a+b)*c^7'
+$first = <>;
+$second = <>;
+chomp $first;
+chomp $second;
 print sum('112a^7b^9+-221a^7b^9+456b');
+print multiply('-123aas+adsad');
